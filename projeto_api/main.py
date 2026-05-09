@@ -1,8 +1,7 @@
 from fastapi import FastAPI, Depends
 from app.controllers import usuario_controller
 from app.schemas.usuario_schema import UsuarioCreate, Login
-from app.auth.auth import verificar_token
-from app.auth.api_key import validar_api_key
+from app.auth.auth import verificar_token, validar_api_key
 
 app = FastAPI()
 
