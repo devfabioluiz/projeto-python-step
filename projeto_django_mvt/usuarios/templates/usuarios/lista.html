@@ -1,21 +1,18 @@
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista de Usuários</title>
-  </head>
-  <body>
-    <h1>Usuários cadastrados</h1>
+{% extends 'usuarios/base.html' %}
 
-    <ul>
-      {% for usuario in usuarios %}
-        <li>{{ usuario.nome }}</li>
-      {% empty %}
+{% block title %}Lista de Usuários{% endblock %}
+
+{% block content %}
+<h1>Usuários cadastrados</h1>
+
+<ul>
+    {% for usuario in usuarios %}
+        <li>{{ usuario.name }} ({{ usuario.email|default:"Sem email" }})</li>
+    {% empty %}
         <li>Nenhum usuário cadastrado.</li>
-      {% endfor %}
-    </ul>
-  </body>
-</html>
-          
+    {% endfor %}
+</ul>
+
+<a href="{% url 'register' %}" class="btn" style="margin-top: 20px;">Adicionar Usuário via API</a>
+{% endblock %}
