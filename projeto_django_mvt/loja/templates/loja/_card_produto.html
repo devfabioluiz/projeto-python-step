@@ -1,0 +1,35 @@
+<!-- _card_produto.html -->
+{% load filtros_produto %}
+<div class="col-md-4 mb-4">
+  <div class="card h-100">
+    {% if produto.imagem %}
+    <img
+      src="{{ produto.imagem.url }}"
+      class="card-img-top"
+      alt="{{ produto.nome }}"
+    />
+    {% endif %}
+    <div class="card-body">
+      <h5 class="card-title">{{ produto.nome|title }}</h5>
+      <p class="card-text">
+        {{ produto.descricao|default:"Sem descrição"|truncatechars:80 }}
+      </p>
+      <p class="card-text">
+        <strong>{{ produto.preco|format_moeda }}</strong>
+      </p>
+      <p>{{ produto.estoque|label_status|safe }}</p>
+    </div>
+    <div class="card-footer">
+      <a
+        href="{% url 'editar_produto' produto.id %}"
+        class="btn btn-sm btn-warning"
+        >Editar</a
+      >
+      <a
+        href="{% url 'excluir_produto' produto.id %}"
+        class="btn btn-sm btn-danger"
+        >Excluir</a
+      >
+    </div>
+  </div>
+</div>

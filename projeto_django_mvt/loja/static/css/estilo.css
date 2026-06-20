@@ -1,0 +1,28 @@
+/* static/css/estilo.css */
+.card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+.badge-success {
+  background-color: #28a745;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.badge-warning {
+  background-color: #ffc107;
+  color: #333;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.badge-danger {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
