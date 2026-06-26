@@ -1,0 +1,29 @@
+
+NOME: SEU_NOME
+EMAIL: SEU_EMAIL
+LINKEDIN: linkedin.com/in/SEU_USERNAME
+GITHUB: github.com/SEU_USERNAME
+
+RESUMO PROFISSIONAL:
+Desenvolvedor Backend com 3 anos de experiência em Python, Django e FastAPI.
+Experiência com bancos de dados SQL e NoSQL, APIs REST e microsserviços.
+
+HABILIDADES TÉCNICAS:
+- Python (Django, FastAPI, Flask)
+- Bancos de Dados: PostgreSQL, MongoDB, SQLite
+- REST APIs, GraphQL
+- Docker, Git, CI/CD
+- HTML, CSS, JavaScript básico
+- Testes automatizados (pytest)
+
+FORMAÇÃO:
+- Análise e Desenvolvimento de Sistemas — UNIP (2023)
+
+CERTIFICAÇÕES:
+- PCAP — Certified Associate in Python Programming (2024)
+- Cisco NetAcad — Python Essentials 2
+
+IDIOMAS:
+- Português (nativo)
+- Inglês (intermediário — leitura técnica fluente)
+          
