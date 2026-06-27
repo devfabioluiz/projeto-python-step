@@ -1,15 +1,16 @@
 import os
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
-from crewai import Agent
+from crewai import Agent, LLM
 from crewai_tools import ScrapeWebsiteTool, FileReadTool
 
 load_dotenv()
 
-llm = ChatGroq(
+llm = LLM(
+    model="llama-3.3-70b-versatile",
+    base_url="https://api.groq.com/openai/v1",
     api_key=os.getenv("GROQ_API_KEY"),
-    model="llama3-70b-8192",
     temperature=0.3,
+    provider="openai",
 )
 
 # ============================================================

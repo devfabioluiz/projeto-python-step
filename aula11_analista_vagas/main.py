@@ -32,7 +32,7 @@ print("\n" + "=" * 60)
 print("  🚀 INICIANDO ANÁLISE DA VAGA")
 print("=" * 60)
 print(f"  URL: {URL_VAGA}")
-print(f"  Modelo: llama3-70b (Groq)")
+print(f"  Modelo: llama-3.3-70b (Groq)")
 print("=" * 60 + "\n")
 
 resultado = crew.kickoff(inputs={"url_vaga": URL_VAGA})
