@@ -12,6 +12,7 @@ from api.middlewares import JWT_SECRET, autenticar, admin, limiter
 router = APIRouter()
 
 
+@router.get("/")
 @router.get("/api")
 @limiter.limit("100/minute")
 async def root(request: Request):
@@ -19,6 +20,11 @@ async def root(request: Request):
         "mensagem": "API do Projeto Final Python funcionando!",
         "versao": "1.0.0",
     }
+
+
+@router.get("/favicon.ico")
+async def favicon():
+    return JSONResponse(status_code=204)
 
 
 @router.post("/api/registrar")
