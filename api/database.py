@@ -6,6 +6,7 @@ import os
 load_dotenv()
 
 _engine = None
+_SessionLocal = None
 
 
 def get_engine():
@@ -27,9 +28,12 @@ class Base(DeclarativeBase):
 
 
 def get_db():
+    global _SessionLocal
     engine = get_engine()
-    SessionLocal = sessionmaker(bind=engine)
-    db = SessionLocal()
+    if _SessionLocal is None:
+        _SessionLocal = sessionmaker(bind=engine)
+        Base.metadata.create_all(bind=engine)
+    db = _SessionLocal()
     try:
         yield db
     finally:
