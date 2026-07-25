@@ -5,17 +5,21 @@ import os
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+_engine = None
 
-if not DATABASE_URL:
-    raise ValueError(
-        "DATABASE_URL não encontrada. "
-        "Crie um banco no Supabase e coloque a URL no .env"
-    )
 
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(bind=engine)
+def get_engine():
+    global _engine
+    if _engine is not None:
+        return _engine
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    if not DATABASE_URL:
+        raise ValueError(
+            "DATABASE_URL não encontrada. "
+            "Crie um banco no Supabase e coloque a URL no .env"
+        )
+    _engine = create_engine(DATABASE_URL)
+    return _engine
 
 
 class Base(DeclarativeBase):
@@ -23,6 +27,8 @@ class Base(DeclarativeBase):
 
 
 def get_db():
+    engine = get_engine()
+    SessionLocal = sessionmaker(bind=engine)
     db = SessionLocal()
     try:
         yield db

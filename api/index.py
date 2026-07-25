@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.database import Base, engine
+from api.database import Base, get_engine
 from api.routes import router
 from api.middlewares import (
     configurar_cors,
@@ -22,4 +22,4 @@ app.include_router(router)
 
 @app.on_event("startup")
 def criar_tabelas():
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=get_engine())

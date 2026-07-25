@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from api.database import Base, engine, SessionLocal
+from api.database import Base, get_engine
 from api.models import Usuario
 import bcrypt
 
@@ -7,9 +7,11 @@ load_dotenv()
 
 
 def seed():
+    engine = get_engine()
     Base.metadata.create_all(bind=engine)
 
-    db = SessionLocal()
+    from sqlalchemy.orm import sessionmaker
+    SessionLocal = sessionmaker(bind=engine)
 
     if db.query(Usuario).count() > 0:
         print("Banco já populado. Pulando seed.")
