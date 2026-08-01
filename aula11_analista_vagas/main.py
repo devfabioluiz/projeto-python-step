@@ -1,57 +1,118 @@
 
+import cv2
 import os
-from datetime import datetime
-from crewai import Crew, Process
-from agents import job_scraper, cv_analyst, career_strategist
-from tasks import scrape_task, analyze_task, strategize_task
+import numpy as np
 
-# ============================================================
-# CONFIGURAÇÃO
-# ============================================================
-# Cole aqui a URL da vaga que quer analisar
-URL_VAGA = input("Cole a URL da vaga: ").strip()
-
-if not URL_VAGA:
-    print("❌ Nenhuma URL fornecida. Usando URL de exemplo...")
-    URL_VAGA = "https://exemplo.com/vaga-python"  # substitua por uma real
-
-# ============================================================
-# MONTAR A CREW
-# ============================================================
-crew = Crew(
-    agents=[job_scraper, cv_analyst, career_strategist],
-    tasks=[scrape_task, analyze_task, strategize_task],
-    process=Process.sequential,
-    verbose=True,
+face_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
 
-# ============================================================
-# EXECUTAR
-# ============================================================
-print("\n" + "=" * 60)
-print("  🚀 INICIANDO ANÁLISE DA VAGA")
-print("=" * 60)
-print(f"  URL: {URL_VAGA}")
-print(f"  Modelo: llama-3.3-70b (Groq)")
-print("=" * 60 + "\n")
+ARQUIVO_TREINO = "treino.yml"
+PASTA_FACES = "faces"
 
-resultado = crew.kickoff(inputs={"url_vaga": URL_VAGA})
+def coletar():
+    nome = input("Digite o nome da pessoa: ")
+    destino = os.path.join(PASTA_FACES, nome)
+    os.makedirs(destino, exist_ok=True)
 
-# ============================================================
-# SALVAR RESULTADOS
-# ============================================================
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    webcam = cv2.VideoCapture(0)
+    contador = 0
 
-# Salvar resultado completo
-os.makedirs("output", exist_ok=True)
-with open(f"output/resultado_completo_{timestamp}.md", "w", encoding="utf-8") as f:
-    f.write(f"# Análise de Vaga — {timestamp}\n\n")
-    f.write(f"**URL:** {URL_VAGA}\n\n")
-    f.write("---\n\n")
-    f.write(str(resultado))
+    while contador < 30:
+        ret, frame = webcam.read()
+        if not ret:
+            break
+        cinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        rostos = face_cascade.detectMultiScale(cinza, 1.3, 5)
+        for (x, y, w, h) in rostos:
+            contador += 1
+            face = cv2.resize(cinza[y:y+h, x:x+w], (200, 200))
+            cv2.imwrite(f"{destino}/{contador}.jpg", face)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.putText(frame, f"{contador}/30", (x, y-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        cv2.imshow("Coletando - Q para cancelar", frame)
+        if cv2.waitKey(100) & 0xFF == ord("q"):
+            break
 
-print("\n" + "=" * 60)
-print("  ✅ ANÁLISE CONCLUÍDA!")
-print(f"  Relatório salvo em: output/resultado_completo_{timestamp}.md")
-print("=" * 60)
+    webcam.release()
+    cv2.destroyAllWindows()
+    print(f"Coleta de '{nome}' finalizada com {contador} amostras.")
+
+def treinar():
+    recognizer = cv2.face.LBPHFaceRecognizer.create()
+    faces, labels, label_map = [], [], {}
+
+    for idx, pasta in enumerate(os.listdir(PASTA_FACES)):
+        caminho = os.path.join(PASTA_FACES, pasta)
+        if not os.path.isdir(caminho):
+            continue
+        label_map[idx] = pasta
+        for arquivo in os.listdir(caminho):
+            img = cv2.imread(os.path.join(caminho, arquivo), 0)
+            if img is None:
+                continue
+            faces.append(cv2.resize(img, (200, 200)))
+            labels.append(idx)
+
+    if not faces:
+        print("Nenhuma face encontrada para treino.")
+        return {}
+
+    recognizer.train(faces, np.array(labels))
+    recognizer.save(ARQUIVO_TREINO)
+    print(f"Treino concluido com {len(faces)} amostras.")
+    return label_map
+
+def reconhecer(label_map):
+    if not os.path.exists(ARQUIVO_TREINO):
+        print("Arquivo de treino nao encontrado. Treine primeiro.")
+        return
+
+    recognizer = cv2.face.LBPHFaceRecognizer.create()
+    recognizer.read(ARQUIVO_TREINO)
+
+    webcam = cv2.VideoCapture(0)
+    while True:
+        ret, frame = webcam.read()
+        if not ret:
+            break
+        cinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        rostos = face_cascade.detectMultiScale(cinza, 1.3, 5)
+        for (x, y, w, h) in rostos:
+            face = cv2.resize(cinza[y:y+h, x:x+w], (200, 200))
+            label, confianca = recognizer.predict(face)
+            nome = label_map.get(label, "Desconhecido")
+            cor = (0, 255, 0) if confianca < 70 else (0, 0, 255)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), cor, 2)
+            cv2.putText(frame, f"{nome} ({confianca:.0f}%)",
+                        (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, cor, 2)
+        cv2.imshow("Reconhecimento - Q para sair", frame)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+
+    webcam.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    print("=== RECONHECIMENTO FACIAL ===")
+    print("1 - Coletar amostras")
+    print("2 - Treinar modelo")
+    print("3 - Reconhecer ao vivo")
+    opcao = input("Escolha uma opcao: ")
+
+    if opcao == "1":
+        coletar()
+    elif opcao == "2":
+        treinar()
+    elif opcao == "3":
+        mapa = treinar() if not os.path.exists(ARQUIVO_TREINO) else {}
+        if not mapa:
+            mapa = {}
+            for idx, pasta in enumerate(os.listdir(PASTA_FACES)):
+                if os.path.isdir(os.path.join(PASTA_FACES, pasta)):
+                    mapa[idx] = pasta
+        reconhecer(mapa)
+    else:
+        print("Opcao invalida.")
           
