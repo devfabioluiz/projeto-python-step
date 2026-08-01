@@ -1,13 +1,15 @@
 
 import cv2
+import sys
 
 # Carrega o classificador
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
 # Carrega a imagem
 img = cv2.imread("grupo.jpg")
+if img is None:
+    print("Erro: imagem 'grupo.jpg' nao encontrada. Coloque-a ao lado dos scripts.")
+    sys.exit(1)
 cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # Detecta rostos
@@ -27,4 +29,3 @@ print(f"Rostos detectados: {len(rostos)}")
 cv2.imshow("Deteccao Facial", img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-          

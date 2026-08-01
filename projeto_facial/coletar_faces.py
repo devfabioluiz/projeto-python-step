@@ -1,15 +1,17 @@
 
 import cv2
 import os
+import sys
 
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
 nome = input("Digite seu nome: ")
 os.makedirs(f"faces/{nome}", exist_ok=True)
 
 webcam = cv2.VideoCapture(0)
+if not webcam.isOpened():
+    print("Erro: nao foi possivel abrir a webcam.")
+    sys.exit(1)
 contador = 0
 
 while contador < 30:
@@ -35,4 +37,3 @@ while contador < 30:
 webcam.release()
 cv2.destroyAllWindows()
 print("Coleta finalizada!")
-          

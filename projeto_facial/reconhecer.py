@@ -1,9 +1,13 @@
 
 import cv2
+import os
+import sys
 
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+
+if not os.path.exists("treino.yml"):
+    print("Erro: 'treino.yml' nao encontrado. Rode coletar_faces.py e treinar.py primeiro.")
+    sys.exit(1)
 
 recognizer = cv2.face.LBPHFaceRecognizer.create()
 recognizer.read("treino.yml")
@@ -11,6 +15,9 @@ recognizer.read("treino.yml")
 label_map = {0: "Joao", 1: "Maria"}  # Ajuste conforme sua coleta
 
 webcam = cv2.VideoCapture(0)
+if not webcam.isOpened():
+    print("Erro: nao foi possivel abrir a webcam.")
+    sys.exit(1)
 
 while True:
     ret, frame = webcam.read()
@@ -39,4 +46,3 @@ while True:
 
 webcam.release()
 cv2.destroyAllWindows()
-          

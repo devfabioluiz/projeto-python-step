@@ -1,11 +1,13 @@
 
 import cv2
+import sys
 
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 
 webcam = cv2.VideoCapture(0)
+if not webcam.isOpened():
+    print("Erro: nao foi possivel abrir a webcam.")
+    sys.exit(1)
 
 while True:
     ret, frame = webcam.read()
@@ -25,4 +27,3 @@ while True:
 
 webcam.release()
 cv2.destroyAllWindows()
-          
